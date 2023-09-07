@@ -3,8 +3,6 @@ version: "3.9"
 networks:
   app-network:
     driver: bridge
-  nats-network:
-    driver: bridge
 
 services:
   postgres:
@@ -33,25 +31,10 @@ services:
     networks:
       - app-network
 
-# docker run -d -p 4223:4223 -p 8223:8223 --name=nats-streaming --network=l0_test-task nats-streaming -p 4223 -m 8223
-  nats:
-    image: nats:latest
-    environment:
-      - NATS_CLUSTER_ID=${NATS_CLUSTER_ID}
+  nats-streaming:
+    image: nats-streaming:latest
     ports:
       - "4222:4222"
     restart: unless-stopped
     networks:
-      - nats-network
-  nats-streaming:
-    image: nats-streaming:latest
-    environment:
-      - STAN_CLUSTER_ID=${NATS_CLUSTER_ID}
-      - STAN_NATS_URL=${NATS_URL}
-    ports:
-      - "4223:4223"
-    depends_on:
-      - nats
-    restart: unless-stopped
-    networks:
-      - nats-network
+      - app-network

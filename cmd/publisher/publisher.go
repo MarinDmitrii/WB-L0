@@ -1,32 +1,22 @@
-package main
+package publisher
 
 import (
 	"encoding/json"
 	"log"
 	"math/rand"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/MarinDmitrii/WB-L0/internal/order/domain"
-	"github.com/joho/godotenv"
-	"github.com/nats-io/nats.go"
+	"github.com/nats-io/stan.go"
 )
 
-// func NatsPublisher() {
-func main() {
-	nc, err := nats.Connect(nats.DefaultURL, nats.Name("WBtest"))
+func NatsPublisher() {
+	sc, err := stan.Connect("test-cluster", "WBpub")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("!1 %v", err)
 	}
-	defer nc.Close()
-
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	subject := os.Getenv("NATS_SUBJECT")
+	defer sc.Close()
 
 	for i := 0; ; i++ {
 		randomOrder := RandomOrder()
@@ -36,15 +26,13 @@ func main() {
 			return
 		}
 
-		err = nc.Publish(subject, message)
+		err = sc.Publish("WBorder", message)
 		if err != nil {
 			log.Fatalf("Can't publish message into NATS: %v\n", err)
 		}
 
 		time.Sleep(5 * time.Second)
 	}
-
-	log.Println("Message sent successfully")
 }
 
 func randomString(length int) string {
@@ -57,7 +45,6 @@ func randomString(length int) string {
 }
 
 func randomInt(min, max int) int {
-	rand.Seed(time.Now().UnixNano())
 	return min + rand.Intn(max-min+1)
 }
 

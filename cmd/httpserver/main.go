@@ -11,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/MarinDmitrii/WB-L0/cmd/publisher"
+	"github.com/MarinDmitrii/WB-L0/cmd/subscriber"
 	orderBuilder "github.com/MarinDmitrii/WB-L0/internal/order/builder"
 	orderPorts "github.com/MarinDmitrii/WB-L0/internal/order/ports"
 )
@@ -63,6 +65,9 @@ func (a *Application) Run(addr string, debug bool) error {
 }
 
 func main() {
+	go subscriber.NatsSubscriber()
+	go publisher.NatsPublisher()
+
 	app := &Application{}
 	err := app.Run(":9090", false)
 	if err != nil {
