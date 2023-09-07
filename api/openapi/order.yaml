@@ -1,0 +1,220 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: WB-L0 API
+  description: API for making and getting orders
+servers:
+  - url: https://{hostname}/api/v1
+    variables:
+      hostname:
+        default: 127.0.0.1:9090
+paths:
+  /orders:
+    post:
+      tags:
+        - orders
+      summary: Create order
+      operationId: createOrder
+      requestBody:
+        description: Order object that needs to be added to the service
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostOrder'
+        required: true
+      responses:
+        200:
+          description: The order has been made
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ id ]
+                properties:
+                  id:
+                    type: string
+        400:
+          description: The request is invalid
+        500:
+          description: Internal server error
+
+  /orders/{order_uid}:
+    get:
+      tags:
+        - orders
+      summary: Get order by UID
+      operationId: getOrderByID
+      parameters: # возможно стоит убрать
+        - in: path
+          name: order_uid
+          schema:
+            type: string
+          required: true
+          description: Order entry UID
+      responses:
+        200:
+          description: todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        500:
+          description: Internal server error
+components:
+  schemas:
+    PostOrder:
+      type: object
+      required: [
+        order_uid, track_number, entry,
+        delivery, payment, items,
+        locale, internal_signature, customer_id,
+        delivery_service, shardkey, sm_id, date_created, oof_shard,
+      ]
+      properties:
+        order_uid:
+          type: string
+        track_number:
+          type: string
+        entry:
+          type: string
+        delivery:
+          $ref: '#/components/schemas/Delivery'
+        payment:
+          $ref: '#/components/schemas/Payment'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        locale:
+          type: string
+        internal_signature:
+          type: string
+        customer_id:
+          type: string
+        delivery_service:
+          type: string
+        shardkey:
+          type: string
+        sm_id:
+          type: integer
+        date_created:
+          type: string
+          format: 'date-time'
+        oof_shard:
+          type: string
+    Delivery:
+      type: object
+      required: [
+        name, phone, zip, city, address, region, email,
+      ]
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        zip:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        region:
+          type: string
+        email:
+          type: string
+    Payment:
+      type: object
+      required: [
+        transaction, request_id, currency, provider, amount,
+        payment_dt, bank, delivery_cost, goods_total, custom_fee,
+      ]
+      properties:
+        transaction:
+          type: string
+        request_id:
+          type: string
+        currency:
+          type: string
+        provider:
+          type: string
+        amount:
+          type: integer
+        payment_dt:
+          type: integer
+        bank:
+          type: string
+        delivery_cost:
+          type: integer
+        goods_total:
+          type: integer
+        custom_fee:
+          type: integer
+    Item:
+      type: object
+      required: [
+        chrt_id, track_number, price, rid, name, sale,
+        size, total_price, nm_id, brand, status,
+      ]
+      properties:
+        chrt_id:
+          type: integer
+        track_number:
+          type: string
+        price:
+          type: integer
+        rid:
+          type: string
+        name:
+          type: string
+        sale:
+          type: integer
+        size:
+          type: string
+        total_price:
+          type: integer
+        nm_id:
+          type: integer
+        brand:
+          type: string
+        status:
+          type: integer
+    Order:
+      type: object
+      required: [
+        order_uid, track_number, entry,
+        delivery, payment, items,
+        locale, internal_signature, customer_id,
+        delivery_service, shardkey, sm_id, date_created, oof_shard,
+      ]
+      properties:
+        order_uid:
+          type: string
+        track_number:
+          type: string
+        entry:
+          type: string
+        delivery:
+          $ref: '#/components/schemas/Delivery'
+        payment:
+          $ref: '#/components/schemas/Payment'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        locale:
+          type: string
+        internal_signature:
+          type: string
+        customer_id:
+          type: string
+        delivery_service:
+          type: string
+        shardkey:
+          type: string
+        sm_id:
+          type: integer
+        date_created:
+          type: string
+          format: 'date-time'
+        oof_shard:
+          type: string
