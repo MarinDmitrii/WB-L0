@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"time"
-)
-
 type Order struct {
 	OrderUID          string
 	TrackNumber       string
@@ -17,7 +13,7 @@ type Order struct {
 	DeliveryService   string
 	Shardkey          string
 	SmID              int
-	DateCreated       time.Time
+	DateCreated       string
 	OofShard          string
 }
 

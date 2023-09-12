@@ -1,0 +1,113 @@
+<html>
+<head>
+    <title>Order</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+        }
+        input[type="submit"] {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search order by OrderUID</h1>
+    <div class="idForm">
+        <input type="text" name="id"
+               placeholder="Введите id"
+               onchange="document.getElementById('link').href='http://localhost:9090/orders/'+escape(this.value)" />
+        <a id="link" href="http://localhost:9090/">ок!</a>
+    </div>
+    
+    <table>
+        <tr>
+            <th><p> <b>Order</b> </p> </th>
+            <th><p> <b>Delivery</b> </p> </th>
+            <th><p> <b>Payment</b> </p> </th>
+        </tr>
+        <tr>
+            <td class="order">
+                <p> OrderUID: {{.OrderUID}} </p>
+                <p> TrackNumber: {{.TrackNumber}} </p>
+                <p> Entry: {{.Entry}} </p>
+                <p> Locale: {{.Locale}} </p>
+                <p> InternalSignature: {{.InternalSignature}} </p>
+                <p> CustomerID: {{.CustomerID}} </p>
+                <p> DeliveryService: {{.DeliveryService}} </p>
+                <p> Shardkey: {{.Shardkey}} </p>
+                <p> SmID: {{.SmID}} </p>
+                <p> DateCreated: {{.DateCreated}} </p>
+                <p> OofShard: {{.OofShard}} </p>
+            </td>
+            <td class="delivery">
+                <p> Name: {{.Delivery.Name}} </p>
+                <p> Phone: {{.Delivery.Phone}} </p>
+                <p> Zip: {{.Delivery.Zip}} </p>
+                <p> City: {{.Delivery.City}} </p>
+                <p> Address: {{.Delivery.Address}} </p>
+                <p> Region: {{.Delivery.Region}} </p>
+                <p> Email: {{.Delivery.Email}} </p>
+            </td>
+            <td class="payment">
+                <p> Transaction: {{.Payment.Transaction}} </p>
+                <p> RequestID: {{.Payment.RequestID}} </p>
+                <p> Currency: {{.Payment.Currency}} </p>
+                <p> Provider: {{.Payment.Provider}} </p>
+                <p> Amount: {{.Payment.Amount}} </p>
+                <p> PaymentDt: {{.Payment.PaymentDt}} </p>
+                <p> Bank: {{.Payment.Bank}} </p>
+                <p> DeliveryCost: {{.Payment.DeliveryCost}} </p>
+                <p> GoodsTotal: {{.Payment.GoodsTotal}} </p>
+                <p> CustomFee: {{.Payment.CustomFee}} </p>
+            </td>
+        </tr>
+    </table>
+
+    <table id="it">
+        {{range .Items}}
+        <tr>
+            <th><p> <b>Item</b> </p> </th>
+            <td class="items">
+            <p> ChrtID: {{.ChrtID}} </p>
+            <p> TrackNumber: {{.TrackNumber}} </p>
+            <p> Price: {{.Price}} </p>
+            <p> Rid: {{.Rid}} </p>
+            <p> Name: {{.Name}} </p>
+            <p> Sale: {{.Sale}} </p>
+            <p> Size: {{.Size}} </p>
+            <p> TotalPrice: {{.TotalPrice}} </p>
+            <p> NmID: {{.NmID}} </p>
+            <p> Brand: {{.Brand}} </p>
+            <p> Status: {{.Status}} </p>
+            </td>
+        </tr>
+        {{end}}
+    </table>
+    
+    </body>
+    </html>

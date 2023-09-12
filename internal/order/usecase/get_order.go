@@ -6,14 +6,30 @@ import (
 	"github.com/MarinDmitrii/WB-L0/internal/order/domain"
 )
 
-type GetOrderByIDUseCase struct {
+type GetOrderByUIDUseCase struct {
 	orderRepository domain.Repository
+	cacheRepository domain.CacheRepository
 }
 
-func NewGetOrderByIDUseCase(orderRepository domain.Repository) *GetOrderByIDUseCase {
-	return &GetOrderByIDUseCase{orderRepository: orderRepository}
+func NewGetOrderByUIDUseCase(
+	orderRepository domain.Repository,
+	cacheRepository domain.CacheRepository,
+) *GetOrderByUIDUseCase {
+	return &GetOrderByUIDUseCase{
+		orderRepository: orderRepository,
+		cacheRepository: cacheRepository,
+	}
 }
 
-func (uc *GetOrderByIDUseCase) Execute(ctx context.Context, orderUID string) (domain.Order, error) {
-	return uc.orderRepository.GetOrderByID(ctx, orderUID)
+func (uc *GetOrderByUIDUseCase) Execute(ctx context.Context, orderUID string) (domain.Order, error) {
+	order, err := uc.cacheRepository.GetOrderByUID(ctx, orderUID)
+	if err != nil {
+		order, err = uc.orderRepository.GetOrderByUID(ctx, orderUID)
+		if err != nil {
+			return domain.Order{}, err
+		}
+		uc.cacheRepository.SaveOrder(ctx, order)
+	}
+
+	return order, nil
 }

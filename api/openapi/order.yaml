@@ -9,42 +9,13 @@ servers:
       hostname:
         default: 127.0.0.1:9090
 paths:
-  /orders:
-    post:
-      tags:
-        - orders
-      summary: Create order
-      operationId: createOrder
-      requestBody:
-        description: Order object that needs to be added to the service
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PostOrder'
-        required: true
-      responses:
-        200:
-          description: The order has been made
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [ id ]
-                properties:
-                  id:
-                    type: string
-        400:
-          description: The request is invalid
-        500:
-          description: Internal server error
-
   /orders/{order_uid}:
     get:
       tags:
         - orders
       summary: Get order by UID
-      operationId: getOrderByID
-      parameters: # возможно стоит убрать
+      operationId: getOrderByUID
+      parameters:
         - in: path
           name: order_uid
           schema:
@@ -62,7 +33,7 @@ paths:
           description: Internal server error
 components:
   schemas:
-    PostOrder:
+    Order:
       type: object
       required: [
         order_uid, track_number, entry,
@@ -99,7 +70,7 @@ components:
           type: integer
         date_created:
           type: string
-          format: 'date-time'
+          # format: 'date-time'
         oof_shard:
           type: string
     Delivery:
@@ -178,43 +149,3 @@ components:
           type: string
         status:
           type: integer
-    Order:
-      type: object
-      required: [
-        order_uid, track_number, entry,
-        delivery, payment, items,
-        locale, internal_signature, customer_id,
-        delivery_service, shardkey, sm_id, date_created, oof_shard,
-      ]
-      properties:
-        order_uid:
-          type: string
-        track_number:
-          type: string
-        entry:
-          type: string
-        delivery:
-          $ref: '#/components/schemas/Delivery'
-        payment:
-          $ref: '#/components/schemas/Payment'
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Item'
-        locale:
-          type: string
-        internal_signature:
-          type: string
-        customer_id:
-          type: string
-        delivery_service:
-          type: string
-        shardkey:
-          type: string
-        sm_id:
-          type: integer
-        date_created:
-          type: string
-          format: 'date-time'
-        oof_shard:
-          type: string

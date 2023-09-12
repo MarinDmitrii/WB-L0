@@ -14,24 +14,40 @@ import (
 func NatsPublisher() {
 	sc, err := stan.Connect("test-cluster", "WBpub")
 	if err != nil {
-		log.Fatalf("!1 %v", err)
+		log.Fatalf("Can't connect to the NATS Streaming: %v\n", err)
 	}
 	defer sc.Close()
 
 	for i := 0; ; i++ {
-		randomOrder := RandomOrder()
-		message, err := json.Marshal(randomOrder)
-		if err != nil {
-			log.Fatalf("Can't marshal order to json: %v\n", err)
-			return
+		if i%4 == 0 {
+			badOrder := BadOrder()
+			message, err := json.Marshal(badOrder)
+			if err != nil {
+				log.Fatalf("Can't marshal order to json: %v\n", err)
+				return
+			}
+			// log.Printf("publish bad message")
+
+			err = sc.Publish("WBorder", message)
+			if err != nil {
+				log.Fatalf("Can't publish message into NATS: %v\n", err)
+			}
+		} else {
+			randomOrder := RandomOrder()
+			message, err := json.Marshal(randomOrder)
+			if err != nil {
+				log.Fatalf("Can't marshal order to json: %v\n", err)
+				return
+			}
+			// log.Printf("publish true message")
+
+			err = sc.Publish("WBorder", message)
+			if err != nil {
+				log.Fatalf("Can't publish message into NATS: %v\n", err)
+			}
 		}
 
-		err = sc.Publish("WBorder", message)
-		if err != nil {
-			log.Fatalf("Can't publish message into NATS: %v\n", err)
-		}
-
-		time.Sleep(5 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
 
@@ -48,10 +64,35 @@ func randomInt(min, max int) int {
 	return min + rand.Intn(max-min+1)
 }
 
+func BadOrder() []*domain.Item {
+	trackNumber := "WB" + randomString(12)
+	items := []*domain.Item{
+		{
+			ChrtID:      randomInt(1000000, 9999999),
+			TrackNumber: trackNumber,
+			Price:       randomInt(100, 9999),
+			Rid:         randomString(17) + "test",
+			Name:        randomString(randomInt(4, 13)),
+			Brand:       randomString(randomInt(4, 18)),
+			Status:      randomInt(100, 400),
+		},
+		{
+			Sale:       randomInt(0, 70),
+			Size:       randomString(1),
+			TotalPrice: randomInt(100, 999),
+			NmID:       randomInt(1000000, 9999999),
+		},
+	}
+
+	return items
+}
+
 func RandomOrder() *domain.Order {
 	orderUID := randomString(15) + "test"
 	entry := "WB" + randomString(2)
 	trackNumber := entry + randomString(10)
+	timeN := time.Now()
+	timeNow := string(timeN.Format(time.RFC3339))
 
 	order := domain.Order{
 		OrderUID:    orderUID,
@@ -92,6 +133,19 @@ func RandomOrder() *domain.Order {
 				Brand:       randomString(randomInt(4, 18)),
 				Status:      randomInt(100, 400),
 			},
+			{
+				ChrtID:      randomInt(1000000, 9999999),
+				TrackNumber: trackNumber,
+				Price:       randomInt(100, 9999),
+				Rid:         randomString(17) + "test",
+				Name:        randomString(randomInt(4, 13)),
+				Sale:        randomInt(0, 70),
+				Size:        randomString(1),
+				TotalPrice:  randomInt(100, 999),
+				NmID:        randomInt(1000000, 9999999),
+				Brand:       randomString(randomInt(4, 18)),
+				Status:      randomInt(100, 400),
+			},
 		},
 		Locale:            "en",
 		InternalSignature: "",
@@ -99,7 +153,7 @@ func RandomOrder() *domain.Order {
 		DeliveryService:   "meest",
 		Shardkey:          "9",
 		SmID:              99,
-		DateCreated:       time.Now(),
+		DateCreated:       timeNow,
 		OofShard:          "1",
 	}
 

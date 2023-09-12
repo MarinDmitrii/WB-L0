@@ -6,5 +6,11 @@ import (
 
 type Repository interface {
 	SaveOrder(ctx context.Context, order Order) (string, error)
-	GetOrderByID(ctx context.Context, orderUID string) (Order, error)
+	GetAll(ctx context.Context) ([]Order, error)
+	GetOrderByUID(ctx context.Context, orderUID string) (Order, error)
+}
+
+type CacheRepository interface {
+	SaveOrder(ctx context.Context, order Order) (string, error)
+	GetOrderByUID(ctx context.Context, orderUID string) (Order, error)
 }

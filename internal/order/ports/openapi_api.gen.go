@@ -13,12 +13,9 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Create order
-	// (POST /orders)
-	SaveOrder(ctx echo.Context) error
 	// Get order by UID
 	// (GET /orders/{order_uid})
-	GetOrderByID(ctx echo.Context, orderUID string) error
+	GetOrderByUID(ctx echo.Context, orderUID string) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -26,17 +23,8 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// CreateOrder converts echo context to params.
-func (w *ServerInterfaceWrapper) CreateOrder(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.SaveOrder(ctx)
-	return err
-}
-
-// GetOrderByID converts echo context to params.
-func (w *ServerInterfaceWrapper) GetOrderByID(ctx echo.Context) error {
+// GetOrderByUID converts echo context to params.
+func (w *ServerInterfaceWrapper) GetOrderByUID(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "order_uid" -------------
 	var orderUID string
@@ -47,7 +35,7 @@ func (w *ServerInterfaceWrapper) GetOrderByID(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.GetOrderByID(ctx, orderUID)
+	err = w.Handler.GetOrderByUID(ctx, orderUID)
 	return err
 }
 
@@ -79,7 +67,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.POST(baseURL+"/orders", wrapper.CreateOrder)
-	router.GET(baseURL+"/orders/:order_uid", wrapper.GetOrderByID)
+	router.GET(baseURL+"/orders/:order_uid", wrapper.GetOrderByUID)
 
 }

@@ -12,13 +12,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/MarinDmitrii/WB-L0/cmd/publisher"
-	"github.com/MarinDmitrii/WB-L0/cmd/subscriber"
 	orderBuilder "github.com/MarinDmitrii/WB-L0/internal/order/builder"
 	orderPorts "github.com/MarinDmitrii/WB-L0/internal/order/ports"
 )
 
 type HttpServer struct {
 	orderPorts.HttpOrderHandler
+	orderPorts.NatsOrderHandler
 }
 
 type Application struct {
@@ -29,6 +29,7 @@ func (a *Application) Run(addr string, debug bool) error {
 	router := echo.New()
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recover())
+	router.Static("/orders", "web/index.html")
 
 	ctx := context.Background()
 
@@ -53,10 +54,16 @@ func (a *Application) Run(addr string, debug bool) error {
 		}
 	}()
 
+	doneCh := make(chan struct{})
+	orderNatsHandler := orderPorts.NewNatsOrderHandler(orderApp)
+	orderNatsHandler.NatsSubscriber(ctx, doneCh)
+
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("Shutting down server...")
+
+	close(doneCh)
 
 	ctx, shutdown := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdown()
@@ -65,7 +72,6 @@ func (a *Application) Run(addr string, debug bool) error {
 }
 
 func main() {
-	go subscriber.NatsSubscriber()
 	go publisher.NatsPublisher()
 
 	app := &Application{}
@@ -73,5 +79,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 }
