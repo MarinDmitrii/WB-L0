@@ -1,6 +1,4 @@
-WB Tech: level # 0 (Golang)
-
-# Задание L0 для стажировки Wildberries 
+# WB Tech: level # 0 (Golang)
 
 Используемые технологии:
 - Go 
